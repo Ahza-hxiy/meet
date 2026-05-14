@@ -3,133 +3,29 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Keluarga Pinky Pro - Visualizer</title>
+    <title>Keluarga Pinky - Jarak Jauh OK</title>
     <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
     <style>
-        :root {
-            --primary-pink: #ff85a1;
-            --soft-pink: #fbb1bd;
-            --dark-pink: #f72585;
-            --bg-pink: #fff0f3;
-            --white: #ffffff;
-        }
-
+        :root { --primary-pink: #ff85a1; --soft-pink: #fbb1bd; --dark-pink: #f72585; --bg-pink: #fff0f3; --white: #ffffff; }
         * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-
-        body {
-            font-family: 'Segoe UI', Roboto, sans-serif;
-            background-color: var(--bg-pink);
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            overflow-x: hidden;
-        }
-
-        #setup-container {
-            margin: auto;
-            background: var(--white);
-            padding: 30px;
-            border-radius: 25px;
-            box-shadow: 0 10px 25px rgba(247, 37, 133, 0.1);
-            text-align: center;
-            width: 90%;
-            max-width: 380px;
-        }
-
-        h1 { color: var(--dark-pink); margin-bottom: 20px; font-size: 1.5rem; }
-        input {
-            width: 100%; padding: 15px; margin: 10px 0;
-            border: 2px solid var(--soft-pink); border-radius: 12px;
-            outline: none; text-align: center; font-size: 16px;
-        }
-
-        button.main-btn {
-            background-color: var(--primary-pink); color: white;
-            border: none; padding: 15px; border-radius: 12px;
-            cursor: pointer; font-weight: bold; width: 100%;
-        }
+        body { font-family: 'Segoe UI', sans-serif; background-color: var(--bg-pink); min-height: 100vh; display: flex; flex-direction: column; overflow-x: hidden; }
+        
+        #setup-container { margin: auto; background: var(--white); padding: 30px; border-radius: 25px; box-shadow: 0 10px 25px rgba(247,37,133,0.1); text-align: center; width: 90%; max-width: 380px; }
+        input { width: 100%; padding: 15px; margin: 10px 0; border: 2px solid var(--soft-pink); border-radius: 12px; outline: none; text-align: center; }
+        button.main-btn { background-color: var(--primary-pink); color: white; border: none; padding: 15px; border-radius: 12px; cursor: pointer; font-weight: bold; width: 100%; }
 
         #call-container { display: none; width: 100%; flex: 1; flex-direction: column; padding: 10px; }
-        
-        #video-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 15px;
-            max-width: 1100px;
-            margin: 0 auto;
-            width: 100%;
-        }
-
+        #video-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 15px; max-width: 1100px; margin: 0 auto; width: 100%; }
         @media (max-width: 600px) { #video-grid { grid-template-columns: 1fr; } }
 
-        .video-wrapper {
-            position: relative; background: #2a2a2a;
-            border-radius: 20px; overflow: hidden;
-            border: 4px solid var(--white); aspect-ratio: 16/9;
-        }
-
+        .video-wrapper { position: relative; background: #2a2a2a; border-radius: 20px; overflow: hidden; border: 4px solid var(--white); aspect-ratio: 16/9; box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
         video { width: 100%; height: 100%; object-fit: cover; }
         #local-video { transform: scaleX(-1); border-color: var(--primary-pink); }
+        .name-tag { position: absolute; bottom: 10px; left: 10px; background: rgba(0,0,0,0.5); color: white; padding: 2px 10px; border-radius: 6px; font-size: 11px; z-index: 10; }
 
-        /* VISUALIZER CANVAS */
-        #visualizer {
-            position: absolute;
-            bottom: 40px;
-            left: 10px;
-            width: 100px;
-            height: 30px;
-            background: rgba(0,0,0,0.3);
-            border-radius: 5px;
-            z-index: 10;
-        }
-
-        .name-tag {
-            position: absolute; bottom: 10px; left: 10px;
-            background: rgba(0, 0, 0, 0.5); color: white;
-            padding: 2px 10px; border-radius: 6px; font-size: 11px;
-            z-index: 11;
-        }
-
-        .emoji-panel {
-            position: fixed; right: 15px; top: 50%; transform: translateY(-50%);
-            display: grid; grid-template-columns: 1fr 1fr; gap: 8px;
-            background: rgba(255, 255, 255, 0.9);
-            padding: 12px; border-radius: 20px; z-index: 100;
-        }
-
-        @media (max-width: 600px) {
-            .emoji-panel { top: auto; bottom: 100px; right: 50%; transform: translateX(50%); grid-template-columns: repeat(5, 1fr); }
-        }
-
-        .btn-emoji { width: 40px; height: 40px; border-radius: 50%; border: none; cursor: pointer; font-size: 20px; background: var(--bg-pink); }
-
-        /* CONTROLS & VOLUME SLIDER */
-        .controls {
-            position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
-            display: flex; gap: 12px; align-items: center;
-            background: rgba(255, 255, 255, 0.95);
-            padding: 12px 25px; border-radius: 50px; box-shadow: 0 8px 30px rgba(0,0,0,0.2);
-            z-index: 100;
-        }
-
-        .volume-box { display: flex; flex-direction: column; align-items: center; gap: 2px; }
-        .volume-box label { font-size: 10px; color: var(--dark-pink); font-weight: bold; }
-        input[type=range] { width: 80px; accent-color: var(--primary-pink); }
-
+        .controls { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); display: flex; gap: 12px; align-items: center; background: rgba(255,255,255,0.9); padding: 12px 25px; border-radius: 50px; box-shadow: 0 8px 30px rgba(0,0,0,0.2); z-index: 100; }
         .btn-ctl { width: 45px; height: 45px; border-radius: 50%; border: none; cursor: pointer; font-size: 20px; background: var(--bg-pink); }
         .active-off { background-color: #ff4d6d !important; color: white; }
-
-        .reaction {
-            position: fixed; bottom: 120px; left: 50%;
-            font-size: 70px; animation: floatUp 2.5s ease-out forwards;
-            pointer-events: none; z-index: 1000;
-        }
-
-        @keyframes floatUp {
-            0% { opacity: 0; transform: translate(-50%, 0) scale(0.5); }
-            20% { opacity: 1; transform: translate(-50%, -30px) scale(1.2); }
-            100% { opacity: 0; transform: translate(-50%, -250px) scale(1); }
-        }
     </style>
 </head>
 <body>
@@ -137,145 +33,90 @@
     <div id="setup-container">
         <h1>🌸 Temu Keluarga</h1>
         <input type="text" id="name-input" placeholder="Nama Kamu">
+        <input type="text" id="room-input" placeholder="Nama Ruangan" value="keluarga-afif">
         <button class="main-btn" id="join-btn">Gabung Sekarang</button>
     </div>
 
     <div id="call-container">
-        <div class="emoji-panel">
-            <button class="btn-emoji" onclick="sendReaction('❤️')">❤️</button>
-            <button class="btn-emoji" onclick="sendReaction('😂')">😂</button>
-            <button class="btn-emoji" onclick="sendReaction('🥳')">🥳</button>
-            <button class="btn-emoji" onclick="sendReaction('👍')">👍</button>
-            <button class="btn-emoji" onclick="sendReaction('👋')">👋</button>
-        </div>
-
         <div id="video-grid">
             <div class="video-wrapper">
                 <video id="local-video" autoplay muted playsinline></video>
-                <canvas id="visualizer"></canvas>
                 <div class="name-tag" id="local-name">Kamu</div>
             </div>
         </div>
-
         <div class="controls">
             <button class="btn-ctl" id="mic-btn" onclick="toggleMic()">🎤</button>
-            
-            <div class="volume-box">
-                <label>Vol Mic</label>
-                <input type="range" id="gain-control" min="0" max="2" step="0.1" value="1">
-            </div>
-
             <button class="btn-ctl" id="cam-btn" onclick="toggleCam()">📷</button>
             <button class="btn-ctl" onclick="window.location.reload()" style="background: #ff4d6d; color: white;">📞</button>
         </div>
     </div>
 
     <script>
-        const setupContainer = document.getElementById('setup-container');
-        const callContainer = document.getElementById('call-container');
         const videoGrid = document.getElementById('video-grid');
         const localVideo = document.getElementById('local-video');
-        const gainControl = document.getElementById('gain-control');
-        const canvas = document.getElementById('visualizer');
-        const canvasCtx = canvas.getContext('2d');
-        
-        let myStream, audioContext, analyzer, gainNode, isMicOn = true, isCamOn = true;
-        const peer = new Peer(undefined, { host: '/', port: '443', secure: true });
+        let myStream, peer, isMicOn = true, isCamOn = true;
 
         document.getElementById('join-btn').addEventListener('click', async () => {
-            const inputName = document.getElementById('name-input').value || "Keluarga";
-            document.getElementById('local-name').innerText = inputName;
-            setupContainer.style.display = 'none';
-            callContainer.style.display = 'flex';
+            const roomName = document.getElementById('room-input').value.trim().toLowerCase();
+            const myName = document.getElementById('name-input').value || "Keluarga";
+            if(!roomName) return alert("Masukkan nama ruangan!");
+
+            document.getElementById('local-name').innerText = myName;
+            document.getElementById('setup-container').style.display = 'none';
+            document.getElementById('call-container').style.display = 'flex';
 
             try {
-                const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-                
-                // SETUP AUDIO NODES
-                audioContext = new (window.AudioContext || window.webkitAudioContext)();
-                const source = audioContext.createMediaStreamSource(stream);
-                
-                // Gain Node (Volume)
-                gainNode = audioContext.createGain();
-                source.connect(gainNode);
-                
-                // Analyzer (Visualizer)
-                analyzer = audioContext.createAnalyser();
-                analyzer.fftSize = 64;
-                gainNode.connect(analyzer);
-
-                const destination = audioContext.createMediaStreamDestination();
-                gainNode.connect(destination);
-
-                // Buat Stream Gabungan
-                myStream = new MediaStream([
-                    stream.getVideoTracks()[0],
-                    destination.stream.getAudioTracks()[0]
-                ]);
-
+                myStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
                 localVideo.srcObject = myStream;
-                drawVisualizer();
 
-                // Listener Volume
-                gainControl.addEventListener('input', () => {
-                    gainNode.gain.value = gainControl.value;
+                // STRATEGI: Gunakan roomName sebagai ID Peer. 
+                // Karena PeerJS ID harus unik, kita tambahkan suffix untuk orang kedua, dst.
+                // Tapi untuk versi paling simpel: Gunakan ID random dan panggil roomName.
+                peer = new Peer(); 
+
+                peer.on('open', (id) => {
+                    console.log('ID Saya:', id);
+                    // Panggil ID Ruangan (ini teknik 'lobby' sederhana)
+                    const call = peer.call(roomName, myStream);
+                    if(call) handleCall(call);
                 });
 
                 peer.on('call', call => {
                     call.answer(myStream);
-                    const video = document.createElement('video');
-                    video.setAttribute('autoplay', '');
-                    video.setAttribute('playsinline', '');
-                    const wrapper = document.createElement('div');
-                    wrapper.classList.add('video-wrapper');
-                    call.on('stream', userStream => {
-                        video.srcObject = userStream;
-                        wrapper.append(video);
-                        videoGrid.append(wrapper);
-                    });
+                    handleCall(call);
                 });
-            } catch (e) { alert("Akses Kamera/Mic Ditolak!"); }
+
+                // Coba "menjadi" host ruangan jika belum ada
+                const hostPeer = new Peer(roomName); 
+                hostPeer.on('call', call => {
+                    call.answer(myStream);
+                    handleCall(call);
+                });
+
+            } catch (e) { alert("Akses kamera/mic ditolak!"); }
         });
 
-        function drawVisualizer() {
-            requestAnimationFrame(drawVisualizer);
-            const bufferLength = analyzer.frequencyBinCount;
-            const dataArray = new Uint8Array(bufferLength);
-            analyzer.getByteFrequencyData(dataArray);
+        function handleCall(call) {
+            const video = document.createElement('video');
+            video.setAttribute('autoplay', '');
+            video.setAttribute('playsinline', '');
+            const wrapper = document.createElement('div');
+            wrapper.classList.add('video-wrapper');
+            const tag = document.createElement('div');
+            tag.classList.add('name-tag');
+            tag.innerText = "Keluarga";
 
-            canvasCtx.clearRect(0, 0, canvas.width, canvas.height);
-            const barWidth = (canvas.width / bufferLength) * 2.5;
-            let x = 0;
-
-            for(let i = 0; i < bufferLength; i++) {
-                const barHeight = dataArray[i] / 5;
-                canvasCtx.fillStyle = `rgb(255, 133, 161)`; // Warna Pink
-                canvasCtx.fillRect(x, canvas.height - barHeight, barWidth, barHeight);
-                x += barWidth + 1;
-            }
+            call.on('stream', userStream => {
+                video.srcObject = userStream;
+                wrapper.append(video);
+                wrapper.append(tag);
+                videoGrid.append(wrapper);
+                video.play().catch(console.error);
+            });
         }
 
-        function sendReaction(emoji) {
-            const reaction = document.createElement('div');
-            reaction.classList.add('reaction');
-            reaction.innerText = emoji;
-            document.body.appendChild(reaction);
-            setTimeout(() => reaction.remove(), 2500);
-        }
-
-        function toggleMic() {
-            isMicOn = !isMicOn;
-            myStream.getAudioTracks()[0].enabled = isMicOn;
-            document.getElementById('mic-btn').innerText = isMicOn ? "🎤" : "🔇";
-            document.getElementById('mic-btn').classList.toggle('active-off', !isMicOn);
-        }
-
-        function toggleCam() {
-            isCamOn = !isCamOn;
-            myStream.getVideoTracks()[0].enabled = isCamOn;
-            document.getElementById('cam-btn').innerText = isCamOn ? "📷" : "🚫";
-            document.getElementById('cam-btn').classList.toggle('active-off', !isCamOn);
-        }
+        function toggleMic() { isMicOn = !isMicOn; myStream.getAudioTracks()[0].enabled = isMicOn; document.getElementById('mic-btn').innerText = isMicOn ? "🎤" : "🔇"; document.getElementById('mic-btn').classList.toggle('active-off', !isMicOn); }
+        function toggleCam() { isCamOn = !isCamOn; myStream.getVideoTracks()[0].enabled = isCamOn; document.getElementById('cam-btn').innerText = isCamOn ? "📷" : "🚫"; document.getElementById('cam-btn').classList.toggle('active-off', !isCamOn); }
     </script>
 </body>
 </html>
